@@ -73,6 +73,7 @@ class CppTranspiler(CLikeTranspiler):
                             '#include <iostream>', '#include <string>',
                             '#include <algorithm>', '#include <cmath>',
                             '#include <vector>', '#include <tuple>',
+                            '#include <unordered_map>',
                             '#include <utility>', '#include "range.hpp"'])
         self.usings = set([])
         self.use_catch_test_cases = False
@@ -241,6 +242,18 @@ class CppTranspiler(CLikeTranspiler):
 
         else:
             raise ValueError("Cannot create vector without elements")
+    def visit_Dict(self, node):
+        if len(node.keys) > 0:
+            kv_string = []
+            for i in range(len(node.keys)):
+                key = self.visit(node.keys[i])
+                value = self.visit(node.values[i])
+                kv_string.append("{{0}, {1}}".format(key, value))
+            initialization = "{ {0} }"
+            return initialization.format(", ".join(kv_string))
+        else:
+            return "{}"
+
 
     def visit_Subscript(self, node):
         if isinstance(node.slice, ast.Ellipsis):
@@ -311,6 +324,14 @@ class CppTranspiler(CLikeTranspiler):
             return "{0} {1} {{{2}}};".format(decltype(node),
                                              self.visit(target),
                                              ", ".join(elements))
+        elif isinstance(node.value, ast.Dict):
+            keys = [self.visit(e) for e in node.value.keys]
+            values = [self.visit(e) for e in node.value.values]
+            key_vals = ["{" + key + "," + val + "}" for key, val in zip(keys, values)]
+
+            return "{0} {1} {{{2}}};".format(decltype(node),
+                                             self.visit(target),
+                                             ", ".join(key_vals))
         else:
             target = self.visit(target)
             value = self.visit(node.value)

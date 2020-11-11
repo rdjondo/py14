@@ -5,11 +5,24 @@ import ast
 from .analysis import get_id
 from .clike import CLikeTranspiler
 
-
+import typing
 def decltype(node):
     """Create C++ decltype statement"""
     if is_list(node):
         return "std::vector<decltype({0})>".format(value_type(node))
+    if is_dict(node):
+        if node.value.keys is not None and len(node.value.keys) > 0:
+            key0 = node.value.keys[0].value
+            if isinstance(key0, str) and not key0.isnumeric():
+                key0 = 'std::string("{0}")'.format(key0)
+            value0 = node.value.values[0].value
+            if isinstance(value0, str) and not value0.isnumeric():
+                value0 = 'std::string("{0}")'.format(value0)
+            return "std::unordered_map<decltype({0}), decltype({1})>".format(key0,
+                        value0)
+        else:
+            hint = "?" # typing.get_type_hints(node.value)
+            return f"std::unordered_map<decltype({hint}), decltype(?)>"
     else:
         return "decltype({0})".format(value_type(node))
 
@@ -32,6 +45,19 @@ def is_list(node):
     else:
         return False
 
+def is_dict(node):
+    """Check if a node was assigned as a list"""
+    if isinstance(node, ast.Dict):
+        return True
+    elif isinstance(node, ast.Assign):
+        return is_dict(node.value)
+    elif isinstance(node, ast.Name):
+        var = node.scopes.find(get_id(node))
+        return (hasattr(var, "assigned_from") and not
+                isinstance(var.assigned_from, ast.FunctionDef) and
+                is_dict(var.assigned_from.value))
+    else:
+        return False
 
 def value_expr(node):
     """
