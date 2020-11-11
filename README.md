@@ -5,12 +5,14 @@
 [![Code Health](https://landscape.io/github/lukasmartinelli/py14/master/landscape.svg?style=flat)](https://landscape.io/github/lukasmartinelli/py14/master)
 [![Dependency Status](https://gemnasium.com/lukasmartinelli/py14.svg)](https://gemnasium.com/lukasmartinelli/py14)
 
-Try it out online: http://py14.lukasmartinelli.ch/
+Try it out online: http://py14.lukasmartinelli.ch/ [The website seems to be down]
 
-This is a little experiment that shows how far you can go with the
-C++ 14 `auto` return type and templates.
+This is a fork of a little experiment that shows how far you can go with the
+C++ 14 `auto` return type and templates. This for is based on Lukas Martinelli [https://github.com/lukasmartinelli/py14](py14)
 C++14 has such powerful type deduction that it is possible to transpile
 Python into C++ without worrying about the missing type annotations in python. Only a small subset of Python is working and you will encounter many bugs. The goal is to showcase the power of C++14 templates and not to create a fully functional transpiler.
+
+This fork aims at adding the latest C++ capabilities to 
 
 ## Example
 
@@ -34,6 +36,15 @@ template <typename T1> auto factorial(T1 num) {
   return factorial(num - 1) * num;
 }
 ```
+
+# Some other notable transpiler projects :
+[https://github.com/shedskin/shedskin](Shedskin)
+Shedskin is an experimental (restricted-Python)-to-C++ compiler written in C++.
+The project was 75 non-trivial programs and development appears to have stalled.
+
+[https://github.com/konchunas/pyrs](pyrs)
+Python to Rust transpiler. This work is derived from py14.
+
 
 ## How it works
 
@@ -236,6 +247,25 @@ Builtins
 Data Structures
 
 - [x] list
-- [ ] Set
+- [ ] set
 - [x] String
 - [ ] Dict
+- [ ] OrderedDict
+- [ ] deque
+
+Python libraries
+- [ ] numpy      (might use [https://github.com/dpilger26/NumCpp](NumCpp) project )
+- [ ] matplotlib (might use [https://github.com/lava/matplotlib-cpp](matplotlib-cpp) project )
+
+
+# For developers
+
+You can then install the package in “editable” mode by running from the same directory:
+``` bash
+pip install -e .
+```
+
+To run the tests execute the following
+``` bash
+pytest --pyargs py14 
+```
