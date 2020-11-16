@@ -41,15 +41,60 @@ def generate_catch_test_case(node, body):
     return funcdef + " {\n" + body + "\n}"
 
 
+def unpack_type_annotation(arg_slice, param=''):
+    arg_slice_id = get_id(arg_slice.value)
+    if arg_slice_id is not None:
+        param +=  arg_slice_id
+    elif isinstance(arg_slice.value, ast.Subscript):
+        param +=  arg_slice.value.value
+    else:
+        raise ValueError('This annotation case has not been implemented:' + arg_slice.value)
+    if hasattr(arg_slice.value, 'slice'):
+        param += '<' + unpack_type_annotation(arg_slice.value.slice, param) + '>'
+    return param
+
+def collect_type_annotation(arg, param = ''):
+    annotation_name = get_id(arg.annotation)
+    if annotation_name is None:
+        annotation_name = arg.annotation
+        while not isinstance(annotation_name, ast.Subscript):
+            annotation_name = arg.annotation.value
+        annotation_name = annotation_name.value.id
+    if annotation_name == 'str':
+        param += 'std::string'
+    elif annotation_name == 'float':
+        param += 'double'
+    elif annotation_name == 'list':
+        param += 'std::vector'
+        if hasattr(arg.annotation, 'slice'):
+            arg_slice = arg.annotation.slice
+            param += '<' + unpack_type_annotation(arg_slice) + '>'
+    elif annotation_name == 'Dict':
+        param += 'std::unordered_map'
+    elif annotation_name == 'Tuple':
+        param += 'std::tuple'
+    elif annotation_name == 'Set':
+        param += 'std::set'
+    elif annotation_name is None:
+        pass
+    else:
+        param += annotation_name
+    return param
+
 def generate_template_fun(node, body):
-    params = []
+    generic_params = [] # Used in template typename declaration
+    params = []  # Used in function argument
     for idx, arg in enumerate(node.args.args):
-        params.append(("T" + str(idx + 1), get_id(arg)))
-    typenames = ["typename " + arg[0] for arg in params]
+        if arg.annotation == None:
+            generic_params.append(("T" + str(idx + 1), get_id(arg)))
+            params.append(("T" + str(idx + 1), get_id(arg)))
+        else:
+            params.append((collect_type_annotation(arg), get_id(arg)))
+    generic_typenames = ["typename " + arg[0] for arg in generic_params]
 
     template = "inline "
-    if len(typenames) > 0:
-        template = "template <{0}>\n".format(", ".join(typenames))
+    if len(generic_typenames) > 0:
+        template = "template <{0}>\n".format(", ".join(generic_typenames))
     params = ["{0} {1}".format(arg[0], arg[1]) for arg in params]
 
     return_type = "auto"

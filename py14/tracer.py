@@ -5,7 +5,6 @@ import ast
 from .analysis import get_id
 from .clike import CLikeTranspiler
 
-import typing
 def decltype(node):
     """Create C++ decltype statement"""
     if is_list(node):
@@ -21,7 +20,7 @@ def decltype(node):
             return "std::unordered_map<decltype({0}), decltype({1})>".format(key0,
                         value0)
         else:
-            hint = "?" # typing.get_type_hints(node.value)
+            hint = f"{node.type_comment} {dir(node)}"
             return f"std::unordered_map<decltype({hint}), decltype(?)>"
     else:
         return "decltype({0})".format(value_type(node))

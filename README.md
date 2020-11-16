@@ -199,7 +199,8 @@ Only bare functions using the basic language features are supported.
 - [ ] operator overloading
 - [ ] function and class decorators
 - [ ] getter/setter function decorators
-- [ ] list comprehensions
+- [ ] list comprehensions (ListComp)
+- [ ] dict comprehensions (DictComp)
 - [ ] yield (generator functions)
 - [ ] function calls with `*args` and `**kwargs`
 
@@ -231,8 +232,10 @@ Builtins
 - [x] int
 - [ ] float
 - [x] str
+- [ ] f-strings (JoinedStr)
 - [ ] round
 - [x] range
+- [ ] sorted
 - [ ] sum
 - [x] len
 - [ ] map
@@ -247,15 +250,33 @@ Builtins
 Data Structures
 
 - [x] list
-- [ ] set
+- [ ] Set
 - [x] String
 - [ ] Dict
 - [ ] OrderedDict
 - [ ] deque
 
+Python standard library modules
+- [ ] datetime
+- [ ] re  (regex matching)
+- [ ] collections
+- [ ] random
+- [ ] os.path
+- [ ] logging
+- [ ] time
+- [ ] deque
+- [ ] queue
+- [ ] multiprocessing
+- [ ] threading
+- [ ] asyncio 
+- [ ] socket 
+
+
 Python libraries
 - [ ] numpy      (might use [https://github.com/dpilger26/NumCpp](NumCpp) project )
 - [ ] matplotlib (might use [https://github.com/lava/matplotlib-cpp](matplotlib-cpp) project )
+- [ ] conda 
+- [ ] opencv 
 
 
 # For developers
@@ -269,3 +290,6 @@ To run the tests execute the following
 ``` bash
 pytest --pyargs py14 
 ```
+
+For gentle information on how to get started with parsing Python code take a look at https://greentreesnakes.readthedocs.io/en/latest/index.html
+
